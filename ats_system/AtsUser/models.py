@@ -1,13 +1,14 @@
+import uuid
 from django.db import models
 from django.conf import settings
 
 class Organization(models.Model):
-    org_id = models.BigAutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     info = models.JSONField()
 
     def __str__(self):
-        return f"{self.name} (ID: {self.org_id})"
+        return f"{self.name} (ID: {self.id})"
 
 class User(models.Model):
     ROLE_CHOICES = [
@@ -18,19 +19,19 @@ class User(models.Model):
         ('Recruiter', 'Recruiter'),
         ('JobSeeker', 'JobSeeker')
     ]
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    OrgID = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    FirstName = models.CharField(max_length=50, null=True, blank=True)
-    LastName = models.CharField(max_length=50, null=True, blank=True)
-    Email = models.EmailField(unique=True)
-    Phone = models.CharField(max_length=20, null=True, blank=True)
-    PasswordText = models.CharField(max_length=255)
-    Role = models.CharField(max_length=20, choices=ROLE_CHOICES, null=True, blank=True)
-    CreatedAt = models.DateTimeField(auto_now_add=True)
-    UpdatedAt = models.DateTimeField(auto_now=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custom_user')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='users')
+    first_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, null=True, blank=True)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    password_text = models.CharField(max_length=255)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.FirstName} {self.LastName} - Role: {self.Role}"
+        return f"{self.first_name} {self.last_name} - Role: {self.role}"
 
     class Meta:
         permissions = [
@@ -71,29 +72,29 @@ class User(models.Model):
         ]
 
 class Client(models.Model):
-    ClientID = models.AutoField(primary_key=True)
-    ClientTypeName = models.CharField(max_length=100, choices=User.ROLE_CHOICES, null=True, blank=True)
-    CreatedBy = models.ForeignKey(User, on_delete=models.CASCADE)
-    CreatedAt = models.DateTimeField(auto_now_add=True)
-    UpdatedAt = models.DateTimeField(auto_now=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    client_type_name = models.CharField(max_length=100, choices=User.ROLE_CHOICES, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_clients')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Client {self.ClientID} - Type: {self.ClientTypeName}, Created by: {self.CreatedBy}"
+        return f"Client {self.id} - Type: {self.client_type_name}, Created by: {self.created_by}"
 
 class JobSeeker(models.Model):
-    JobSeekerID = models.AutoField(primary_key=True)
-    UserID = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
-    FirstName = models.CharField(max_length=50, null=True, blank=True)
-    LastName = models.CharField(max_length=50, null=True, blank=True)
-    Email = models.EmailField(null=True, blank=True)
-    Phone = models.CharField(max_length=20, null=True, blank=True)
-    HighestEducation = models.CharField(max_length=100, null=True, blank=True)
-    CurrentLocation = models.CharField(max_length=100, null=True, blank=True)
-    State = models.CharField(max_length=50, null=True, blank=True)
-    Country = models.CharField(max_length=50, null=True, blank=True)
-    ResumeFile = models.CharField(max_length=255, null=True, blank=True)
-    CreatedAt = models.DateTimeField(auto_now_add=True)
-    UpdatedAt = models.DateTimeField(auto_now=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='job_seeker', unique=True)
+    first_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    highest_education = models.CharField(max_length=100, null=True, blank=True)
+    current_location = models.CharField(max_length=100, null=True, blank=True)
+    state = models.CharField(max_length=50, null=True, blank=True)
+    country = models.CharField(max_length=50, null=True, blank=True)
+    resume_file = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Job Seeker {self.JobSeekerID} - {self.FirstName} {self.LastName}, Email: {self.Email}"
+        return f"Job Seeker {self.id} - {self.first_name} {self.last_name}, Email: {self.email}"

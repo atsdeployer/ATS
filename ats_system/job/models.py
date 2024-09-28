@@ -1,41 +1,42 @@
+import uuid
 from django.db import models
 from AtsUser.models import *
 
 class Skill(models.Model):
-    SkillID = models.AutoField(primary_key=True)
-    SkillName = models.CharField(max_length=100, null=True, blank=True)
-    SkillType = models.CharField(max_length=50, null=True, blank=True)
-    IsCustomCreated = models.BooleanField(default=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    skill_name = models.CharField(max_length=100, null=True, blank=True)
+    skill_type = models.CharField(max_length=50, null=True, blank=True)
+    is_custom_created = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Skill {self.SkillID}: {self.SkillName} ({self.SkillType})"
+        return f"Skill {self.skill}: {self.skill_name} ({self.skill_type})"
 
 class JobSeekerSkills(models.Model):
-    JobSeekerID = models.ForeignKey(JobSeeker, on_delete=models.CASCADE)
-    SkillID = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='skills')
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='job_seekers')
 
     def __str__(self):
-        return f"{self.JobSeekerID} - Skill: {self.SkillID}"
+        return f"{self.job_seeker} - Skill: {self.skill}"
 
 class JobSeekerExperience(models.Model):
-    ExperienceID = models.AutoField(primary_key=True)
-    JobSeekerID = models.ForeignKey(JobSeeker, on_delete=models.CASCADE)
-    OrganizationName = models.CharField(max_length=100, null=True, blank=True)
-    StartDate = models.DateField(null=True, blank=True)
-    EndDate = models.DateField(null=True, blank=True)
-    ExperienceInfo = models.JSONField(default=dict)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='experiences')
+    organization_name = models.CharField(max_length=100, null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    experience_info = models.JSONField(default=dict)
 
     def __str__(self):
-        return f"Experience {self.ExperienceID} - {self.OrganizationName}, {self.StartDate} to {self.EndDate}"
+        return f"Experience {self.id} - {self.organization_name}, {self.start_date} to {self.end_date}"
 
 class Certification(models.Model):
-    CertificationID = models.AutoField(primary_key=True)
-    JobSeekerID = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, unique=True)
-    CertificationName = models.CharField(max_length=100, null=True, blank=True)
-    CertificationInfo = models.JSONField(default=dict)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, unique=True, related_name='certification')
+    certification_name = models.CharField(max_length=100, null=True, blank=True)
+    certification_info = models.JSONField(default=dict)
 
     def __str__(self):
-        return f"Certification {self.CertificationID}: {self.CertificationName}"
+        return f"Certification {self.id}: {self.certification_name}"
 
 class Job(models.Model):
     JOB_STATUS_CHOICES = [
@@ -45,19 +46,19 @@ class Job(models.Model):
         ('on_hold', 'On Hold'),
     ]
 
-    JobID = models.AutoField(primary_key=True)
-    ClientID = models.ForeignKey(Client, on_delete=models.CASCADE)
-    JobTitle = models.CharField(max_length=100, null=True, blank=True)
-    RequirementNumber = models.CharField(max_length=50, null=True, blank=True)
-    JobDescription = models.TextField(null=True, blank=True)
-    JobStatus = models.CharField(max_length=50, choices=JOB_STATUS_CHOICES, null=True, blank=True)
-    CreatedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='jobs_created')
-    JobInfo = models.JSONField(default=dict)
-    CreatedAt = models.DateTimeField(auto_now_add=True)
-    UpdatedAt = models.DateTimeField(auto_now=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='jobs')
+    job_title = models.CharField(max_length=100, null=True, blank=True)
+    requirement_number = models.CharField(max_length=50, null=True, blank=True)
+    job_description = models.TextField(null=True, blank=True)
+    job_status = models.CharField(max_length=50, choices=JOB_STATUS_CHOICES, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_jobs')
+    job_info = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Job {self.JobID}: {self.JobTitle} - Status: {self.JobStatus}"
+        return f"Job {self.id}: {self.job_title} - Status: {self.job_status}"
 
 class JobApplication(models.Model):
     APPLICATION_STATUS_CHOICES = [
@@ -68,24 +69,24 @@ class JobApplication(models.Model):
         ('hired', 'Hired'),
     ]
 
-    ApplicationID = models.AutoField(primary_key=True)
-    JobID = models.ForeignKey(Job, on_delete=models.CASCADE)
-    JobSeekerID = models.ForeignKey(JobSeeker, on_delete=models.CASCADE)
-    ApplicationStatus = models.CharField(max_length=50, choices=APPLICATION_STATUS_CHOICES, null=True, blank=True)
-    ApplicationInfo = models.JSONField(default=dict)
-    CreatedAt = models.DateTimeField(auto_now_add=True)
-    UpdatedAt = models.DateTimeField(auto_now=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='applications')
+    application_status = models.CharField(max_length=50, choices=APPLICATION_STATUS_CHOICES, null=True, blank=True)
+    application_info = models.JSONField(default=dict)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Application {self.ApplicationID} - Job: {self.JobID}, Seeker: {self.JobSeekerID}, Status: {self.ApplicationStatus}"
+        return f"Application {self.id} - Job: {self.job}, Seeker: {self.job_seeker}, Status: {self.application_status}"
 
 class InterviewPanelAssignment(models.Model):
-    AssignmentID = models.AutoField(primary_key=True)
-    JobID = models.ForeignKey(Job, on_delete=models.CASCADE)
-    UserID = models.ForeignKey(User, on_delete=models.CASCADE)
-    AssignedBy = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments_made')
-    AssignedAt = models.DateTimeField(auto_now_add=True)
-    InterviewInfo = models.JSONField(default=dict)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='interview_panel_assignments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interview_assignments')
+    assigned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments_made')
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    interview_info = models.JSONField(default=dict)
 
     def __str__(self):
-        return f"Assignment {self.AssignmentID} - Job: {self.JobID}, Assigned by: {self.AssignedBy}, At: {self.AssignedAt}"
+        return f"Assignment {self.id} - Job: {self.job}, Assigned by: {self.assigned_by}, At: {self.assigned_at}"
