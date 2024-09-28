@@ -20,6 +20,7 @@ class ATSUser(models.Model):
         ('JobSeeker', 'JobSeeker')
     ]
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custom_user')
+    created_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='users_created')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='users')
     first_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50, null=True, blank=True)
@@ -71,16 +72,6 @@ class ATSUser(models.Model):
             ("can_create_organization", "Can create organization"),
         ]
 
-class Client(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    client_type_name = models.CharField(max_length=100, choices=ATSUser.ROLE_CHOICES, null=True, blank=True)
-    created_by = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='created_clients')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"Client {self.id} - Type: {self.client_type_name}, Created by: {self.created_by}"
-
 class JobSeeker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(ATSUser, on_delete=models.CASCADE, related_name='job_seeker', unique=True)
@@ -98,3 +89,13 @@ class JobSeeker(models.Model):
 
     def __str__(self):
         return f"Job Seeker {self.id} - {self.first_name} {self.last_name}, Email: {self.email}"
+
+# class Client(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     client_type_name = models.CharField(max_length=100, choices=ATSUser.ROLE_CHOICES, null=True, blank=True)
+#     created_by = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='created_clients')
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+
+#     def __str__(self):
+#         return f"Client {self.id} - Type: {self.client_type_name}, Created by: {self.created_by}"

@@ -47,7 +47,7 @@ class Job(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='jobs')
+    user = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='jobs')
     job_title = models.CharField(max_length=100, null=True, blank=True)
     requirement_number = models.CharField(max_length=50, null=True, blank=True)
     job_description = models.TextField(null=True, blank=True)
