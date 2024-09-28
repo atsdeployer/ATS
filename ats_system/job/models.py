@@ -52,7 +52,7 @@ class Job(models.Model):
     requirement_number = models.CharField(max_length=50, null=True, blank=True)
     job_description = models.TextField(null=True, blank=True)
     job_status = models.CharField(max_length=50, choices=JOB_STATUS_CHOICES, null=True, blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_jobs')
+    created_by = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='created_jobs')
     job_info = models.JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -83,8 +83,8 @@ class JobApplication(models.Model):
 class InterviewPanelAssignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='interview_panel_assignments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interview_assignments')
-    assigned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignments_made')
+    user = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='interview_assignments')
+    assigned_by = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='assignments_made')
     assigned_at = models.DateTimeField(auto_now_add=True)
     interview_info = models.JSONField(default=dict)
 
