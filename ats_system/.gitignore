@@ -1,5 +1,5 @@
-# Ignore __pycache__ directories
-__pycache__/
+# Ignore all __pycache__ directories at any level
+**/__pycache__/
 *.py[cod]
 
 # Ignore database files
