@@ -1,0 +1,29 @@
+# Ignore all __pycache__ directories at any level
+**/__pycache__/
+*.py[cod]
+
+# Ignore database files
+*.sqlite3
+
+# Ignore environment settings
+.env
+*.env
+
+# Ignore Django migrations
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Ignore media/uploads
+media/
+uploads/
+
+# Ignore compiled files
+*.pyc
+*.pyo
+
+# Ignore macOS-specific files
+.DS_Store
+
+# Ignore virtual environment directories
+venv/
+env/
