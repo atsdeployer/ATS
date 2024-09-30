@@ -1,17 +1,24 @@
 import uuid
 from django.db import models
 from AtsUser.models import *
+from ats_system.constants import ACTIVE
+class BaseModel(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    status = models.PositiveSmallIntegerField(default=ACTIVE)
 
+    class Meta:
+        abstract = True
 class SkillManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
 
-class Skill(models.Model):
+class Skill(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     skill_name = models.CharField(max_length=100, null=True, blank=True)
     skill_type = models.CharField(max_length=50, null=True, blank=True)
     is_custom_created = models.BooleanField(default=False)
-
+    is_active = models.BooleanField(default=True)
     objects = SkillManager()
 
     def __str__(self):
@@ -20,9 +27,9 @@ class Skill(models.Model):
 
 class JobSeekerSkillsManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
 
-class JobSeekerSkills(models.Model):
+class JobSeekerSkills(BaseModel):
     job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='skills')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='job_seekers')
 
@@ -33,8 +40,8 @@ class JobSeekerSkills(models.Model):
 
 class JobSeekerExperienceManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
-class JobSeekerExperience(models.Model):
+        return super().get_queryset().filter(status=ACTIVE)
+class JobSeekerExperience(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='experiences')
     organization_name = models.CharField(max_length=100, null=True, blank=True)
@@ -49,9 +56,9 @@ class JobSeekerExperience(models.Model):
 
 class CertificationManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
     
-class Certification(models.Model):
+class Certification(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='certification')
     certification_name = models.CharField(max_length=100, null=True, blank=True)
@@ -64,9 +71,9 @@ class Certification(models.Model):
 
 class JobManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
 
-class Job(models.Model):
+class Job(BaseModel):
     JOB_STATUS_CHOICES = [
         ('open', 'Open'),
         ('closed', 'Closed'),
@@ -92,9 +99,9 @@ class Job(models.Model):
 
 class JobApplicationManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
     
-class JobApplication(models.Model):
+class JobApplication(BaseModel):
     APPLICATION_STATUS_CHOICES = [
         ('applied', 'Applied'),
         ('in_review', 'In Review'),
@@ -118,9 +125,9 @@ class JobApplication(models.Model):
 
 class InterviewPanelAssignmentManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
     
-class InterviewPanelAssignment(models.Model):
+class InterviewPanelAssignment(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='interview_panel_assignments')
     user = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='interview_assignments')
@@ -135,9 +142,9 @@ class InterviewPanelAssignment(models.Model):
 
 class JobSeekerEducationManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
 
-class JobSeekerEducation(models.Model):
+class JobSeekerEducation(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='educations')
     institution_name = models.CharField(max_length=100, null=True, blank=True)

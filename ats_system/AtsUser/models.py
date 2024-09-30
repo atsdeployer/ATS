@@ -1,18 +1,26 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from ats_system.constants import ACTIVE, DEACTIVE
+class BaseModel(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    status = models.PositiveSmallIntegerField(default=ACTIVE)
+
+    class Meta:
+        abstract = True
 
 class OrganizationManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
     
     def get_active_organizations(self):
-        return self.get_queryset().filter(is_active=True)
+        return self.get_queryset().filter(status=ACTIVE)
 
     def get_inactive_organizations(self):
-        return self.get_queryset().filter(is_active=False)
+        return self.get_queryset().filter(status=DEACTIVE)
 
-class Organization(models.Model):
+class Organization(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     info = models.JSONField()
@@ -24,9 +32,9 @@ class Organization(models.Model):
 
 class ATSUserManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
 
-class ATSUser(models.Model):
+class ATSUser(BaseModel):
     ROLE_CHOICES = [
         ('Admin', 'Admin'),
         ('Manager', 'Manager'),
@@ -92,9 +100,9 @@ class ATSUser(models.Model):
 
 class JobSeekerManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
+        return super().get_queryset().filter(status=ACTIVE)
 
-class JobSeeker(models.Model):
+class JobSeeker(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(ATSUser, on_delete=models.CASCADE, related_name='job_seeker', unique=True)
     first_name = models.CharField(max_length=50, null=True, blank=True)
@@ -114,7 +122,7 @@ class JobSeeker(models.Model):
     def __str__(self):
         return f"Job Seeker {self.id} - {self.first_name} {self.last_name}, Email: {self.email}"
 
-# class Client(models.Model):
+# class Client(BaseModel):
 #     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 #     client_type_name = models.CharField(max_length=100, choices=ATSUser.ROLE_CHOICES, null=True, blank=True)
 #     created_by = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='created_clients')
