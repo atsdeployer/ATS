@@ -32,3 +32,13 @@ class JobSeekerEducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobSeekerEducation
         fields = '__all__'
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobApplication
+        fields = '__all__'
+
+class InterviewPanelAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterviewPanelAssignment
+        fields = '__all__'

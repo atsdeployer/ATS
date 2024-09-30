@@ -5,6 +5,47 @@ from rest_framework import status
 from .models import *
 from .serializers import *
 
+class SkillView(APIView):
+    def get(self, request):
+        skills = Skill.objects.all()
+        serializer = SkillSerializer(skills, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = SkillSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SkillDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            skill = Skill.objects.get(pk=pk)
+            serializer = SkillSerializer(skill)
+            return Response(serializer.data)
+        except Skill.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk):
+        try:
+            skill = Skill.objects.get(pk=pk)
+            serializer = SkillSerializer(skill, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Skill.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk):
+        try:
+            skill = Skill.objects.get(pk=pk)
+            skill.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Skill.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    
 class JobView(APIView):
     def get(self, request):
         jobs = Job.objects.all()
@@ -167,4 +208,127 @@ class JobSeekerEducationDetailView(APIView):
             job_seeker_education.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except JobSeekerEducation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class CertificationView(APIView):
+    def get(self, request):
+        certifications = Certification.objects.all()
+        serializer = CertificationSerializer(certifications, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = CertificationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CertificationDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            certification = Certification.objects.get(pk=pk)
+            serializer = CertificationSerializer(certification)
+            return Response(serializer.data)
+        except Certification.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk):
+        try:
+            certification = Certification.objects.get(pk=pk)
+            serializer = CertificationSerializer(certification, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Certification.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk):
+        try:
+            certification = Certification.objects.get(pk=pk)
+            certification.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Certification.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class JobApplicationView(APIView):
+    def get(self, request):
+        job_applications = JobApplication.objects.all()
+        serializer = JobApplicationSerializer(job_applications, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = JobApplicationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class JobApplicationDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            job_application = JobApplication.objects.get(pk=pk)
+            serializer = JobApplicationSerializer(job_application)
+            return Response(serializer.data)
+        except JobApplication.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk):
+        try:
+            job_application = JobApplication.objects.get(pk=pk)
+            serializer = JobApplicationSerializer(job_application, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except JobApplication.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk):
+        try:
+            job_application = JobApplication.objects.get(pk=pk)
+            job_application.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except JobApplication.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class InterviewPanelAssignmentView(APIView):
+    def get(self, request):
+        interview_panel_assignments = InterviewPanelAssignment.objects.all()
+        serializer = InterviewPanelAssignmentSerializer(interview_panel_assignments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = InterviewPanelAssignmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class InterviewPanelAssignmentDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            interview_panel_assignment = InterviewPanelAssignment.objects.get(pk=pk)
+            serializer = InterviewPanelAssignmentSerializer(interview_panel_assignment)
+            return Response(serializer.data)
+        except InterviewPanelAssignment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, pk):
+        try:
+            interview_panel_assignment = InterviewPanelAssignment.objects.get(pk=pk)
+            serializer = InterviewPanelAssignmentSerializer(interview_panel_assignment, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except InterviewPanelAssignment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, pk):
+        try:
+            interview_panel_assignment = InterviewPanelAssignment.objects.get(pk=pk)
+            interview_panel_assignment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except InterviewPanelAssignment.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
