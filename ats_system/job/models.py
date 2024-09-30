@@ -2,22 +2,38 @@ import uuid
 from django.db import models
 from AtsUser.models import *
 
+class SkillManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
 class Skill(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     skill_name = models.CharField(max_length=100, null=True, blank=True)
     skill_type = models.CharField(max_length=50, null=True, blank=True)
     is_custom_created = models.BooleanField(default=False)
 
+    objects = SkillManager()
+
     def __str__(self):
-        return f"Skill {self.skill}: {self.skill_name} ({self.skill_type})"
+        return f"Skill {self.id}: {self.skill_name} ({self.skill_type})"
+
+
+class JobSeekerSkillsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
 
 class JobSeekerSkills(models.Model):
     job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='skills')
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE, related_name='job_seekers')
 
+    objects = JobSeekerSkillsManager()
+
     def __str__(self):
         return f"{self.job_seeker} - Skill: {self.skill}"
 
+class JobSeekerExperienceManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
 class JobSeekerExperience(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='experiences')
@@ -25,18 +41,30 @@ class JobSeekerExperience(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     experience_info = models.JSONField(default=dict)
+    
+    objects = JobSeekerManager()
 
     def __str__(self):
         return f"Experience {self.id} - {self.organization_name}, {self.start_date} to {self.end_date}"
 
+class CertificationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+    
 class Certification(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, unique=True, related_name='certification')
+    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='certification')
     certification_name = models.CharField(max_length=100, null=True, blank=True)
     certification_info = models.JSONField(default=dict)
+    
+    objects = CertificationManager()
 
     def __str__(self):
         return f"Certification {self.id}: {self.certification_name}"
+
+class JobManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
 
 class Job(models.Model):
     JOB_STATUS_CHOICES = [
@@ -57,9 +85,15 @@ class Job(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = JobManager()
+
     def __str__(self):
         return f"Job {self.id}: {self.job_title} - Status: {self.job_status}"
 
+class JobApplicationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+    
 class JobApplication(models.Model):
     APPLICATION_STATUS_CHOICES = [
         ('applied', 'Applied'),
@@ -77,9 +111,15 @@ class JobApplication(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = JobApplicationManager()
+
     def __str__(self):
         return f"Application {self.id} - Job: {self.job}, Seeker: {self.job_seeker}, Status: {self.application_status}"
 
+class InterviewPanelAssignmentManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+    
 class InterviewPanelAssignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='interview_panel_assignments')
@@ -87,6 +127,8 @@ class InterviewPanelAssignment(models.Model):
     assigned_by = models.ForeignKey(ATSUser, on_delete=models.CASCADE, related_name='assignments_made')
     assigned_at = models.DateTimeField(auto_now_add=True)
     interview_info = models.JSONField(default=dict)
+
+    objects = InterviewPanelAssignmentManager()
 
     def __str__(self):
         return f"Assignment {self.id} - Job: {self.job}, Assigned by: {self.assigned_by}, At: {self.assigned_at}"

@@ -2,13 +2,29 @@ import uuid
 from django.db import models
 from django.conf import settings
 
+class OrganizationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+    
+    def get_active_organizations(self):
+        return self.get_queryset().filter(is_active=True)
+
+    def get_inactive_organizations(self):
+        return self.get_queryset().filter(is_active=False)
+
 class Organization(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     info = models.JSONField()
 
+    objects = OrganizationManager()
+
     def __str__(self):
         return f"{self.name} (ID: {self.id})"
+
+class ATSUserManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
 
 class ATSUser(models.Model):
     ROLE_CHOICES = [
@@ -30,6 +46,8 @@ class ATSUser(models.Model):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ATSUserManager()
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} - Role: {self.role}"
@@ -72,6 +90,10 @@ class ATSUser(models.Model):
             ("can_create_organization", "Can create organization"),
         ]
 
+class JobSeekerManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
 class JobSeeker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(ATSUser, on_delete=models.CASCADE, related_name='job_seeker', unique=True)
@@ -86,6 +108,8 @@ class JobSeeker(models.Model):
     resume_file = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = JobSeekerManager()
 
     def __str__(self):
         return f"Job Seeker {self.id} - {self.first_name} {self.last_name}, Email: {self.email}"
