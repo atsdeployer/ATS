@@ -1,4 +1,5 @@
 from django.urls import path
+from ats_system.urls import schema_view
 from .views import (
     SkillView,
     SkillDetailView,
@@ -17,8 +18,12 @@ from .views import (
     JobSeekerEducationView,
     JobSeekerEducationDetailView,
 )
+from ats_system.schema import schema_view
 
 urlpatterns = [
+    # Swagger API 
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     # Skill URLs
     path('skills/', SkillView.as_view()),
     path('skills/<pk>/', SkillDetailView.as_view()),

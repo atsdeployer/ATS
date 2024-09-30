@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from drf_yasg import openapi
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
     'AtsUser',
     'job',
 ]
@@ -123,3 +125,27 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# SWAGGER_SETTINGS = {
+#     'USE_SESSION_AUTH': False,
+#     'SECURITY_DEFINITIONS': {
+#         'Bearer': {
+#             'type': 'apiKey',
+#             'in': 'header',
+#             'name': 'Authorization'
+#         }
+#     }
+# }
+
+SWAGGER_SETTINGS = {
+    'DEFAULT_INFO': 'ats_system.settings.openapi_info'
+}
+
+openapi_info = openapi.Info(
+    title="ATS API",
+    default_version='v1',
+    description="ATS project APIs",
+    # terms_of_service="https://www.ats.com/terms/",
+    # contact=openapi.Contact(email="ats@ats.com"),
+    license=openapi.License(name="BSD License"),
+)
