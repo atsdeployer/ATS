@@ -27,3 +27,8 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = '__all__'
+
+class JobSeekerEducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobSeekerEducation
+        fields = '__all__'

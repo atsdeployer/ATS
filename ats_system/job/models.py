@@ -132,3 +132,22 @@ class InterviewPanelAssignment(models.Model):
 
     def __str__(self):
         return f"Assignment {self.id} - Job: {self.job}, Assigned by: {self.assigned_by}, At: {self.assigned_at}"
+
+class JobSeekerEducationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+class JobSeekerEducation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    job_seeker = models.ForeignKey(JobSeeker, on_delete=models.CASCADE, related_name='educations')
+    institution_name = models.CharField(max_length=100, null=True, blank=True)
+    degree = models.CharField(max_length=100, null=True, blank=True)
+    field_of_study = models.CharField(max_length=100, null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    education_info = models.JSONField(default=dict)
+    
+    objects = JobSeekerEducationManager()
+
+    def __str__(self):
+        return f"Education {self.id} - {self.institution_name}, {self.degree}"
